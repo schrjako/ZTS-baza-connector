@@ -718,7 +718,7 @@ class TabornikiClient:
             address: Street address
             postal_code: Postal code
             joined_at: Date joined (format: YYYY-MM-DD), defaults to today
-            note: Optional note
+            note: Optional note - (name, surname, note) should be unique for every user in baza
             additional_contacts: List of additional contacts (default: [])
             magazine_subscription: Whether to subscribe to magazine (default: True)
 
@@ -752,7 +752,8 @@ class TabornikiClient:
             "Sec-Fetch-Site": "same-origin",
         }
         headers.update(self._get_inertia_headers())
-        note = str(uuid.uuid4())
+        if not note:
+            note = str(uuid.uuid4())
         if sex not in ("M", "F", "O"):
             sex = "O"
         payload = {
