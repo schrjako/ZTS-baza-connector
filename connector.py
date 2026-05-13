@@ -140,6 +140,7 @@ class TabornikiClient:
         The version can be found in:
         1. JSON responses with a 'version' field
         2. HTML responses in the data-page attribute of the #app div
+        3. HTML responses in a script tag with data-page="app" and JSON payload
 
         Args:
             response: The HTTP response object
@@ -173,6 +174,22 @@ class TabornikiClient:
                     data = json.loads(page_data)
                     if isinstance(data, dict) and "version" in data:
                         logging.debug(f"Extracted Inertia version from HTML: {data.get('version')}")
+                        return data.get("version")
+            except (json.JSONDecodeError, ValueError):
+                pass
+
+            try:
+                # Look for a script tag with data-page="app" and JSON content
+                match = re.search(
+                    r'<script[^>]*data-page="app"[^>]*>(.*?)</script>',
+                    response.text,
+                    re.DOTALL,
+                )
+                if match:
+                    page_data = match.group(1).strip()
+                    data = json.loads(page_data)
+                    if isinstance(data, dict) and "version" in data:
+                        logging.debug(f"Extracted Inertia version from script JSON: {data.get('version')}")
                         return data.get("version")
             except (json.JSONDecodeError, ValueError):
                 pass
@@ -348,6 +365,7 @@ class TabornikiClient:
         }
 
         logger.info(f"Attempting login for {self.email}...")
+        logger.debug(f"Login request payload: {payload}. Headers: {headers}")
 
         try:
             # Make login request
