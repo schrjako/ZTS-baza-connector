@@ -863,6 +863,7 @@ class TabornikiClient:
             "email": email or "",
             "address": address,
             "postal_code": postal_code,
+            "status": "active",
             "joined_at": joined_at,
             "note": note,
             "additional_contacts": additional_contacts,
